@@ -14,9 +14,12 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
+
+
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
+
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
@@ -28,6 +31,7 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new RuntimeException("Role not found"));
 
         User user = User.builder()
+                .employeeCode(request.getEmployeeCode())
                 .fullName(request.getFullName())
                 .email(request.getEmail())
                 .password(request.getPassword())
@@ -42,6 +46,7 @@ public class UserServiceImpl implements UserService {
 
         return UserResponse.builder()
                 .id(savedUser.getId())
+                .employeeCode(savedUser.getEmployeeCode())
                 .fullName(savedUser.getFullName())
                 .email(savedUser.getEmail())
                 .phone(savedUser.getPhone())
@@ -79,6 +84,7 @@ public class UserServiceImpl implements UserService {
         return users.stream()
                 .map(user -> UserResponse.builder()
                         .id(user.getId())
+                        .employeeCode(user.getEmployeeCode())
                         .fullName(user.getFullName())
                         .email(user.getEmail())
                         .phone(user.getPhone())
@@ -100,6 +106,7 @@ public class UserServiceImpl implements UserService {
 
         return UserResponse.builder()
                 .id(user.getId())
+                .employeeCode(user.getEmployeeCode())
                 .fullName(user.getFullName())
                 .email(user.getEmail())
                 .phone(user.getPhone())
@@ -144,7 +151,7 @@ public class UserServiceImpl implements UserService {
                 );
             }
         }
-
+        user.setEmployeeCode(request.getEmployeeCode());
         user.setFullName(request.getFullName());
         user.setEmail(request.getEmail());
         user.setPassword(request.getPassword());
