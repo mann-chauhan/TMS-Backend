@@ -2,10 +2,18 @@ package com.tms.tms_backend.Enum;
 
 public enum TravelRequestStatus {
     DRAFT,
-    SUBMITTED,
+
+    PENDING_MANAGER,
+
     MANAGER_APPROVED,
+
     FINANCE_APPROVED,
+
     REJECTED,
-    CANCELLED,
-    COMPLETED
+
+    BOOKED,
+
+    COMPLETED,
+
+    CANCELLED
 }

@@ -25,6 +25,13 @@ public interface TravelRequestService {
     TravelRequestResponse rejectRequest(
             Long requestId
     );
-    
 
+    //Finance Approval Module
+    List<TravelRequestResponse> getFinanceRequests();
+
+    TravelRequestResponse financeApproveRequest(Long requestId);
+
+    TravelRequestResponse financeRejectRequest(Long requestId);
+
+    List<TravelRequestResponse> getFinanceDecisionHistory();
 }

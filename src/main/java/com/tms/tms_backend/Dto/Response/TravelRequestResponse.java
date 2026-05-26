@@ -20,6 +20,8 @@ public class TravelRequestResponse {
 
     private String employeeName;
 
+    private String department;
+
     private String managerName;
 
     private String fromLocation;

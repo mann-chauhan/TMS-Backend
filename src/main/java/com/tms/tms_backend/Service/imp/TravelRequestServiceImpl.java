@@ -505,6 +505,11 @@ public class TravelRequestServiceImpl
                                 .getFullName()
                 )
 
+                .department(
+                        request.getEmployee()
+                                .getDepartment()
+                )
+
                 .managerName(
                         updatedRequest.getManager()
                                 .getFullName()
@@ -516,6 +521,10 @@ public class TravelRequestServiceImpl
 
                 .status(
                         updatedRequest.getStatus().name()
+                )
+                .department(
+                        request.getEmployee()
+                                .getDepartment()
                 )
 
                 .build();
@@ -564,6 +573,16 @@ public class TravelRequestServiceImpl
                                 .getFullName()
                 )
 
+                .department(
+                        request.getEmployee()
+                                .getDepartment()
+                )
+
+                .department(
+                        request.getEmployee()
+                                .getDepartment()
+                )
+
                 .managerName(
                         updatedRequest.getManager()
                                 .getFullName()
@@ -575,6 +594,257 @@ public class TravelRequestServiceImpl
 
                 .status(
                         updatedRequest.getStatus().name()
+                )
+
+                .build();
+    }
+
+    @Override
+    public List<TravelRequestResponse> getFinanceRequests() {
+
+        List<TravelRequest> requests =
+                travelRequestRepository.findAll();
+
+        return requests.stream()
+
+                .filter(request ->
+                        request.getStatus()
+                                == TravelRequestStatus.MANAGER_APPROVED
+                )
+
+                .map(request ->
+                        TravelRequestResponse.builder()
+
+                                .id(request.getId())
+
+                                .requestCode(request.getRequestCode())
+
+                                .employeeName(
+                                        request.getEmployee()
+                                                .getFullName()
+                                )
+
+                                .department(
+                                        request.getEmployee()
+                                                .getDepartment()
+                                )
+
+                                .managerName(
+                                        request.getManager()
+                                                .getFullName()
+                                )
+
+                                .destination(
+                                        request.getDestination()
+                                )
+
+                                .startDate(
+                                        request.getStartDate()
+                                )
+
+                                .endDate(
+                                        request.getEndDate()
+                                )
+
+                                .estimatedBudget(
+                                        request.getEstimatedBudget()
+                                )
+
+                                .status(
+                                        request.getStatus().name()
+                                )
+
+                                .build()
+                )
+
+                .toList();
+    }
+
+    @Override
+    public TravelRequestResponse financeApproveRequest(
+            Long requestId
+    ) {
+
+        TravelRequest request =
+                travelRequestRepository
+                        .findById(requestId)
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "Request not found"
+                                )
+                        );
+
+        if(request.getStatus()
+                != TravelRequestStatus.MANAGER_APPROVED){
+
+            throw new RuntimeException(
+                    "Only manager approved requests allowed"
+            );
+        }
+
+        request.setStatus(
+                TravelRequestStatus.FINANCE_APPROVED
+        );
+
+        TravelRequest updated =
+                travelRequestRepository.save(request);
+
+        return TravelRequestResponse.builder()
+
+                .id(updated.getId())
+
+                .requestCode(updated.getRequestCode())
+
+                .employeeName(
+                        updated.getEmployee()
+                                .getFullName()
+                )
+
+                .department(
+                        request.getEmployee()
+                                .getDepartment()
+                )
+
+                .destination(
+                        updated.getDestination()
+                )
+
+                .status(
+                        updated.getStatus().name()
+                )
+
+                .build();
+    }
+
+    @Override
+    public TravelRequestResponse financeRejectRequest(
+            Long requestId
+    ) {
+
+        TravelRequest request =
+                travelRequestRepository
+                        .findById(requestId)
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "Request not found"
+                                )
+                        );
+
+        if(request.getStatus()
+                != TravelRequestStatus.MANAGER_APPROVED){
+
+            throw new RuntimeException(
+                    "Only manager approved requests allowed"
+            );
+        }
+
+        request.setStatus(
+                TravelRequestStatus.REJECTED
+        );
+
+        TravelRequest updated =
+                travelRequestRepository.save(request);
+
+        return TravelRequestResponse.builder()
+
+                .id(updated.getId())
+
+                .requestCode(updated.getRequestCode())
+
+                .employeeName(
+                        updated.getEmployee()
+                                .getFullName()
+                )
+
+                .department(
+                        request.getEmployee()
+                                .getDepartment()
+                )
+
+                .destination(
+                        updated.getDestination()
+                )
+
+                .status(
+                        updated.getStatus().name()
+                )
+
+                .build();
+    }
+
+
+    @Override
+    public List<TravelRequestResponse>
+    getFinanceDecisionHistory() {
+
+        return travelRequestRepository
+                .findAll()
+                .stream()
+
+                .filter(request ->
+
+                        request.getStatus().name()
+                                .equals("FINANCE_APPROVED")
+
+                                ||
+
+                                request.getStatus().name()
+                                        .equals("REJECTED")
+
+                                ||
+
+                                request.getStatus().name()
+                                        .equals("BOOKED")
+
+                                ||
+
+                                request.getStatus().name()
+                                        .equals("COMPLETED")
+                )
+
+                .map(this::mapToResponse)
+
+                .toList();
+    }
+
+    private TravelRequestResponse
+    mapToResponse(TravelRequest request) {
+
+        return TravelRequestResponse.builder()
+
+                .id(request.getId())
+
+                .requestCode(request.getRequestCode())
+
+                .employeeName(
+                        request.getEmployee()
+                                .getFullName()
+                )
+
+                .department(
+                        request.getEmployee()
+                                .getDepartment()
+                )
+
+                .destination(
+                        request.getDestination()
+                )
+
+                .startDate(
+                        request.getStartDate()
+                )
+
+                .endDate(
+                        request.getEndDate()
+                )
+
+                .estimatedBudget(
+                        request.getEstimatedBudget()
+                )
+
+                .status(
+                        request.getStatus()
+                                .name()
                 )
 
                 .build();

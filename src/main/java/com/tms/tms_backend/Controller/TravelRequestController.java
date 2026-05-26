@@ -4,9 +4,12 @@ import com.tms.tms_backend.Dto.Request.CreateTravelRequestDto;
 import com.tms.tms_backend.Dto.Response.ApiResponse;
 import com.tms.tms_backend.Dto.Response.TravelRequestResponse;
 import com.tms.tms_backend.Service.TravelRequestService;
+
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,7 +19,12 @@ import java.util.List;
 @RequiredArgsConstructor
 public class TravelRequestController {
 
-    private final TravelRequestService travelRequestService;
+    private final TravelRequestService
+            travelRequestService;
+
+    // =========================================
+    // CREATE REQUEST
+    // =========================================
 
     @PostMapping
     public ResponseEntity<ApiResponse<TravelRequestResponse>>
@@ -25,7 +33,8 @@ public class TravelRequestController {
     ) {
 
         TravelRequestResponse response =
-                travelRequestService.createRequest(dto);
+                travelRequestService
+                        .createRequest(dto);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
@@ -37,6 +46,10 @@ public class TravelRequestController {
                 );
     }
 
+    // =========================================
+    // EMPLOYEE REQUESTS
+    // =========================================
+
     @GetMapping("/employee/{employeeId}")
     public ApiResponse<List<TravelRequestResponse>>
     getRequestsByEmployee(
@@ -46,27 +59,47 @@ public class TravelRequestController {
         return ApiResponse.success(
 
                 travelRequestService
-                        .getRequestsByEmployee(employeeId),
+                        .getRequestsByEmployee(
+                                employeeId
+                        ),
 
                 "Employee Requests Fetched Successfully"
         );
     }
 
+    // =========================================
+    // CANCEL REQUEST
+    // =========================================
+
     @PutMapping("/cancel/{id}")
     public ApiResponse cancelRequest(
-            @PathVariable Long id){
+            @PathVariable Long id
+    ) {
+
         return ApiResponse.builder()
+
                 .success(true)
-                .message("Request Cancelled Successfully")
-                .data(travelRequestService.cancelRequest(id))
+
+                .message(
+                        "Request Cancelled Successfully"
+                )
+
+                .data(
+                        travelRequestService
+                                .cancelRequest(id)
+                )
+
                 .build();
     }
 
-    @GetMapping("/manager/{managerId}")
+    // =========================================
+    // MANAGER REQUESTS
+    // =========================================
 
+    @GetMapping("/manager/{managerId}")
     public ApiResponse getManagerRequests(
             @PathVariable Long managerId
-    ){
+    ) {
 
         return ApiResponse.builder()
 
@@ -86,11 +119,14 @@ public class TravelRequestController {
                 .build();
     }
 
-    @PutMapping("/approve/{id}")
+    // =========================================
+    // MANAGER APPROVE
+    // =========================================
 
+    @PutMapping("/approve/{id}")
     public ApiResponse approveRequest(
             @PathVariable Long id
-    ){
+    ) {
 
         return ApiResponse.builder()
 
@@ -108,11 +144,14 @@ public class TravelRequestController {
                 .build();
     }
 
-    @PutMapping("/reject/{id}")
+    // =========================================
+    // MANAGER REJECT
+    // =========================================
 
+    @PutMapping("/reject/{id}")
     public ApiResponse rejectRequest(
             @PathVariable Long id
-    ){
+    ) {
 
         return ApiResponse.builder()
 
@@ -127,6 +166,92 @@ public class TravelRequestController {
                                 .rejectRequest(id)
                 )
 
+                .build();
+    }
+
+    // =========================================
+    // FINANCE REQUESTS
+    // =========================================
+
+    @GetMapping("/finance")
+    public ApiResponse getFinanceRequests() {
+
+        return ApiResponse.builder()
+
+                .success(true)
+
+                .message(
+                        "Finance Requests Fetched Successfully"
+                )
+
+                .data(
+                        travelRequestService
+                                .getFinanceRequests()
+                )
+
+                .build();
+    }
+
+    // =========================================
+    // FINANCE APPROVE
+    // =========================================
+
+    @PutMapping("/finance/approve/{id}")
+    public ApiResponse financeApprove(
+            @PathVariable Long id
+    ) {
+
+        return ApiResponse.builder()
+
+                .success(true)
+
+                .message(
+                        "Finance Approved Successfully"
+                )
+
+                .data(
+                        travelRequestService
+                                .financeApproveRequest(id)
+                )
+
+                .build();
+    }
+
+    // =========================================
+    // FINANCE REJECT
+    // =========================================
+
+    @PutMapping("/finance/reject/{id}")
+    public ApiResponse financeReject(
+            @PathVariable Long id
+    ) {
+
+        return ApiResponse.builder()
+
+                .success(true)
+
+                .message(
+                        "Finance Rejected Successfully"
+                )
+
+                .data(
+                        travelRequestService
+                                .financeRejectRequest(id)
+                )
+
+                .build();
+    }
+
+    @GetMapping("/finance/history")
+    public ApiResponse getFinanceDecisionHistory() {
+
+        return ApiResponse.builder()
+                .success(true)
+                .message("Finance decision history fetched")
+                .data(
+                        travelRequestService
+                                .getFinanceDecisionHistory()
+                )
                 .build();
     }
 }
