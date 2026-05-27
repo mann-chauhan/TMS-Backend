@@ -13,6 +13,7 @@ import com.tms.tms_backend.Service.TravelRequestService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -552,8 +553,7 @@ public class TravelRequestServiceImpl
 
     @Override
     public TravelRequestResponse financeApproveRequest(
-            Long requestId
-    ) {
+            Long requestId, String remarks) {
 
         TravelRequest request =
                 travelRequestRepository
@@ -576,6 +576,26 @@ public class TravelRequestServiceImpl
                 TravelRequestStatus.FINANCE_APPROVED
         );
 
+        // =====================================
+        // FINANCE AUDIT INFO
+        // =====================================
+
+        request.setFinanceRemarks(
+                "Approved by finance team"
+        );
+
+        request.setFinanceActionBy(
+                "Finance Admin"
+        );
+
+        request.setFinanceActionDate(
+                LocalDateTime.now()
+        );
+
+        request.setFinanceRemarks(
+                remarks
+        );
+
         TravelRequest updated =
                 travelRequestRepository.save(request);
 
@@ -585,7 +605,7 @@ public class TravelRequestServiceImpl
 
     @Override
     public TravelRequestResponse financeRejectRequest(
-            Long requestId
+            Long requestId, String remarks
     ) {
 
         TravelRequest request =
@@ -607,6 +627,26 @@ public class TravelRequestServiceImpl
 
         request.setStatus(
                 TravelRequestStatus.REJECTED
+        );
+
+        // =====================================
+        // FINANCE AUDIT INFO
+        // =====================================
+
+        request.setFinanceRemarks(
+                "Rejected by finance team"
+        );
+
+        request.setFinanceActionBy(
+                "Finance Admin"
+        );
+
+        request.setFinanceActionDate(
+                LocalDateTime.now()
+        );
+
+        request.setFinanceRemarks(
+                remarks
         );
 
         TravelRequest updated =
@@ -739,6 +779,17 @@ public class TravelRequestServiceImpl
 
                 .status(
                         request.getStatus().name()
+                )
+                .financeRemarks(
+                        request.getFinanceRemarks()
+                )
+
+                .financeActionBy(
+                        request.getFinanceActionBy()
+                )
+
+                .financeActionDate(
+                        request.getFinanceActionDate()
                 )
 
                 .build();

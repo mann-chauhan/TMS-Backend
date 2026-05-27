@@ -1,6 +1,8 @@
 package com.tms.tms_backend.Controller;
+
 import com.tms.tms_backend.Dto.Request.CreateManagerTravelRequestDto;
 import com.tms.tms_backend.Dto.Request.CreateTravelRequestDto;
+import com.tms.tms_backend.Dto.Request.FinanceDecisionDto;
 import com.tms.tms_backend.Dto.Response.ApiResponse;
 import com.tms.tms_backend.Dto.Response.TravelRequestResponse;
 import com.tms.tms_backend.Service.TravelRequestService;
@@ -198,7 +200,8 @@ public class TravelRequestController {
 
     @PutMapping("/finance/approve/{id}")
     public ApiResponse financeApprove(
-            @PathVariable Long id
+            @PathVariable Long id,
+            @RequestBody FinanceDecisionDto dto
     ) {
 
         return ApiResponse.builder()
@@ -211,7 +214,10 @@ public class TravelRequestController {
 
                 .data(
                         travelRequestService
-                                .financeApproveRequest(id)
+                                .financeApproveRequest(
+                                        id,
+                                        dto.getRemarks()
+                                )
                 )
 
                 .build();
@@ -223,7 +229,8 @@ public class TravelRequestController {
 
     @PutMapping("/finance/reject/{id}")
     public ApiResponse financeReject(
-            @PathVariable Long id
+            @PathVariable Long id,
+            @RequestBody FinanceDecisionDto dto
     ) {
 
         return ApiResponse.builder()
@@ -236,7 +243,7 @@ public class TravelRequestController {
 
                 .data(
                         travelRequestService
-                                .financeRejectRequest(id)
+                                .financeRejectRequest(id,dto.getRemarks())
                 )
 
                 .build();

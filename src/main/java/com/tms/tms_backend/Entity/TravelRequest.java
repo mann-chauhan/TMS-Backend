@@ -6,6 +6,7 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "travel_requests")
@@ -64,4 +65,11 @@ public class TravelRequest {
 
     @Enumerated(EnumType.STRING)
     private TravelRequestStatus status;
+
+    @Column(length = 1500)
+    private String financeRemarks;
+
+    private String financeActionBy;
+
+    private LocalDateTime financeActionDate;
 }

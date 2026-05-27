@@ -31,9 +31,9 @@ public interface TravelRequestService {
     //Finance Approval Module
     List<TravelRequestResponse> getFinanceRequests();
 
-    TravelRequestResponse financeApproveRequest(Long requestId);
+    TravelRequestResponse financeApproveRequest(Long requestId, String remarks);
 
-    TravelRequestResponse financeRejectRequest(Long requestId);
+    TravelRequestResponse financeRejectRequest(Long requestId, String remarks);
 
     List<TravelRequestResponse> getFinanceDecisionHistory();
 

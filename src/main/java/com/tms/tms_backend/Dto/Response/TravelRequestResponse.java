@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @Builder
@@ -49,6 +50,14 @@ public class TravelRequestResponse {
     private String additionalNotes;
 
     private String status;
+
+    private String financeRemarks;
+
+    private String financeActionBy;
+
+    private LocalDateTime financeActionDate;
+
+
 
 
 }
