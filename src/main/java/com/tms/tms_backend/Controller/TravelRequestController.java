@@ -1,5 +1,5 @@
 package com.tms.tms_backend.Controller;
-
+import com.tms.tms_backend.Dto.Request.CreateManagerTravelRequestDto;
 import com.tms.tms_backend.Dto.Request.CreateTravelRequestDto;
 import com.tms.tms_backend.Dto.Response.ApiResponse;
 import com.tms.tms_backend.Dto.Response.TravelRequestResponse;
@@ -254,4 +254,44 @@ public class TravelRequestController {
                 )
                 .build();
     }
+
+    @PostMapping("/manager/create")
+    public ApiResponse createManagerRequest(
+            @RequestBody
+            CreateManagerTravelRequestDto dto
+    ) {
+
+        return ApiResponse.builder()
+                .success(true)
+                .message("Manager request created successfully")
+                .data(
+                        travelRequestService
+                                .createManagerRequest(dto)
+                )
+                .build();
+    }
+
+    @GetMapping("/manager/history/{managerId}")
+    public ApiResponse getManagerRequestHistory(
+            @PathVariable Long managerId
+    ) {
+
+        return ApiResponse.builder()
+
+                .success(true)
+
+                .message(
+                        "Manager Request History Fetched"
+                )
+
+                .data(
+                        travelRequestService
+                                .getManagerRequestHistory(
+                                        managerId
+                                )
+                )
+
+                .build();
+    }
+
 }

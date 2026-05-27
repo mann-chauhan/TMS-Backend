@@ -14,4 +14,8 @@ public interface TravelRequestRepository
     List<TravelRequest>
     findByManager_Id(Long managerId);
 
+    List<TravelRequest> findByManager_IdAndEmployeeIsNull(
+            Long managerId
+    );
+
 }

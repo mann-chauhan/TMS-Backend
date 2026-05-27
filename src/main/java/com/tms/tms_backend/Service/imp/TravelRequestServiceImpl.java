@@ -1,5 +1,6 @@
 package com.tms.tms_backend.Service.imp;
 
+import com.tms.tms_backend.Dto.Request.CreateManagerTravelRequestDto;
 import com.tms.tms_backend.Dto.Request.CreateTravelRequestDto;
 import com.tms.tms_backend.Dto.Response.TravelRequestResponse;
 import com.tms.tms_backend.Entity.Role;
@@ -492,42 +493,7 @@ public class TravelRequestServiceImpl
         TravelRequest updatedRequest =
                 travelRequestRepository.save(request);
 
-        return TravelRequestResponse.builder()
-
-                .id(updatedRequest.getId())
-
-                .requestCode(
-                        updatedRequest.getRequestCode()
-                )
-
-                .employeeName(
-                        updatedRequest.getEmployee()
-                                .getFullName()
-                )
-
-                .department(
-                        request.getEmployee()
-                                .getDepartment()
-                )
-
-                .managerName(
-                        updatedRequest.getManager()
-                                .getFullName()
-                )
-
-                .destination(
-                        updatedRequest.getDestination()
-                )
-
-                .status(
-                        updatedRequest.getStatus().name()
-                )
-                .department(
-                        request.getEmployee()
-                                .getDepartment()
-                )
-
-                .build();
+        return mapToResponse(updatedRequest);
     }
 
     @Override
@@ -560,47 +526,13 @@ public class TravelRequestServiceImpl
         TravelRequest updatedRequest =
                 travelRequestRepository.save(request);
 
-        return TravelRequestResponse.builder()
-
-                .id(updatedRequest.getId())
-
-                .requestCode(
-                        updatedRequest.getRequestCode()
-                )
-
-                .employeeName(
-                        updatedRequest.getEmployee()
-                                .getFullName()
-                )
-
-                .department(
-                        request.getEmployee()
-                                .getDepartment()
-                )
-
-                .department(
-                        request.getEmployee()
-                                .getDepartment()
-                )
-
-                .managerName(
-                        updatedRequest.getManager()
-                                .getFullName()
-                )
-
-                .destination(
-                        updatedRequest.getDestination()
-                )
-
-                .status(
-                        updatedRequest.getStatus().name()
-                )
-
-                .build();
+        return mapToResponse(updatedRequest);
     }
 
+
     @Override
-    public List<TravelRequestResponse> getFinanceRequests() {
+    public List<TravelRequestResponse>
+    getFinanceRequests() {
 
         List<TravelRequest> requests =
                 travelRequestRepository.findAll();
@@ -608,54 +540,12 @@ public class TravelRequestServiceImpl
         return requests.stream()
 
                 .filter(request ->
+
                         request.getStatus()
                                 == TravelRequestStatus.MANAGER_APPROVED
                 )
 
-                .map(request ->
-                        TravelRequestResponse.builder()
-
-                                .id(request.getId())
-
-                                .requestCode(request.getRequestCode())
-
-                                .employeeName(
-                                        request.getEmployee()
-                                                .getFullName()
-                                )
-
-                                .department(
-                                        request.getEmployee()
-                                                .getDepartment()
-                                )
-
-                                .managerName(
-                                        request.getManager()
-                                                .getFullName()
-                                )
-
-                                .destination(
-                                        request.getDestination()
-                                )
-
-                                .startDate(
-                                        request.getStartDate()
-                                )
-
-                                .endDate(
-                                        request.getEndDate()
-                                )
-
-                                .estimatedBudget(
-                                        request.getEstimatedBudget()
-                                )
-
-                                .status(
-                                        request.getStatus().name()
-                                )
-
-                                .build()
-                )
+                .map(this::mapToResponse)
 
                 .toList();
     }
@@ -689,32 +579,9 @@ public class TravelRequestServiceImpl
         TravelRequest updated =
                 travelRequestRepository.save(request);
 
-        return TravelRequestResponse.builder()
-
-                .id(updated.getId())
-
-                .requestCode(updated.getRequestCode())
-
-                .employeeName(
-                        updated.getEmployee()
-                                .getFullName()
-                )
-
-                .department(
-                        request.getEmployee()
-                                .getDepartment()
-                )
-
-                .destination(
-                        updated.getDestination()
-                )
-
-                .status(
-                        updated.getStatus().name()
-                )
-
-                .build();
+        return mapToResponse(updated);
     }
+
 
     @Override
     public TravelRequestResponse financeRejectRequest(
@@ -745,33 +612,8 @@ public class TravelRequestServiceImpl
         TravelRequest updated =
                 travelRequestRepository.save(request);
 
-        return TravelRequestResponse.builder()
-
-                .id(updated.getId())
-
-                .requestCode(updated.getRequestCode())
-
-                .employeeName(
-                        updated.getEmployee()
-                                .getFullName()
-                )
-
-                .department(
-                        request.getEmployee()
-                                .getDepartment()
-                )
-
-                .destination(
-                        updated.getDestination()
-                )
-
-                .status(
-                        updated.getStatus().name()
-                )
-
-                .build();
+        return mapToResponse(updated);
     }
-
 
     @Override
     public List<TravelRequestResponse>
@@ -810,20 +652,73 @@ public class TravelRequestServiceImpl
     private TravelRequestResponse
     mapToResponse(TravelRequest request) {
 
+        String roleTitle = null;
+        String employeeName = null;
+        String department = null;
+
+        // =====================================
+        // FLOW 1
+        // Employee -> Manager -> Finance
+        // =====================================
+
+        if (request.getEmployee() != null) {
+
+            employeeName =
+                    request.getEmployee()
+                            .getFullName();
+
+            department =
+                    request.getEmployee()
+                            .getDepartment();
+
+            roleTitle =
+                    request.getEmployee()
+                            .getRole()
+                            .getName()
+                            .name();
+        }
+
+        // =====================================
+        // FLOW 2
+        // Manager -> Finance
+        // =====================================
+
+        else if (request.getManager() != null) {
+
+            employeeName =
+                    request.getManager()
+                            .getFullName();
+
+            department =
+                    request.getManager()
+                            .getDepartment();
+
+            roleTitle =
+                    request.getManager()
+                            .getRole()
+                            .getName()
+                            .name();
+        }
+
         return TravelRequestResponse.builder()
+
 
                 .id(request.getId())
 
-                .requestCode(request.getRequestCode())
-
-                .employeeName(
-                        request.getEmployee()
-                                .getFullName()
+                .requestCode(
+                        request.getRequestCode()
                 )
 
-                .department(
-                        request.getEmployee()
-                                .getDepartment()
+                .employeeName(employeeName)
+
+                .roleTitle(roleTitle)
+
+                .department(department)
+
+                .managerName(
+                        request.getManager() != null
+                                ? request.getManager().getFullName()
+                                : null
                 )
 
                 .destination(
@@ -843,11 +738,107 @@ public class TravelRequestServiceImpl
                 )
 
                 .status(
-                        request.getStatus()
-                                .name()
+                        request.getStatus().name()
                 )
 
                 .build();
+    }
+
+    @Override
+    public TravelRequestResponse createManagerRequest(
+            CreateManagerTravelRequestDto dto
+    ) {
+
+
+        User manager = userRepository
+                .findById(dto.getManagerId())
+                .orElseThrow(() ->
+                        new RuntimeException("Manager Not Found")
+                );
+
+        TravelRequest request =
+                new TravelRequest();
+
+        request.setManager(manager);
+
+        request.setDestination(
+                dto.getDestination()
+        );
+
+        request.setPurpose(
+                dto.getPurpose()
+        );
+
+        request.setStartDate(
+                dto.getStartDate()
+        );
+
+        request.setEndDate(
+                dto.getEndDate()
+        );
+
+        request.setTransportMode(
+                dto.getTransportMode()
+        );
+
+        request.setHotelRequired(
+                dto.getHotelRequired()
+        );
+
+        request.setHotelPreference(
+                dto.getHotelPreference()
+        );
+
+        request.setEstimatedBudget(
+                dto.getEstimatedBudget()
+        );
+
+        request.setAdvancePayment(
+                dto.getAdvancePayment()
+        );
+
+        request.setAdditionalNotes(
+                dto.getAdditionalNotes()
+        );
+
+        request.setEmployee(null);
+
+
+        // =====================================
+        // IMPORTANT
+        // =====================================
+
+        request.setStatus(TravelRequestStatus.MANAGER_APPROVED);
+
+        request.setRequestCode(
+                "MGR-" + System.currentTimeMillis()
+        );
+
+        TravelRequest savedRequest =
+                travelRequestRepository
+                        .save(request);
+
+        return mapToResponse(
+                savedRequest
+        );
+    }
+
+    @Override
+    public List<TravelRequestResponse>
+    getManagerRequestHistory(Long managerId) {
+
+        List<TravelRequest> requests =
+
+                travelRequestRepository
+                        .findByManager_IdAndEmployeeIsNull(
+                                managerId
+                        );
+
+        return requests.stream()
+
+                .map(this::mapToResponse)
+
+                .toList();
     }
 
 }

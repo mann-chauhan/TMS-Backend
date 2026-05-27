@@ -1,5 +1,7 @@
 package com.tms.tms_backend.Service;
 
+import com.tms.tms_backend.Dto.Request.CreateManagerTravelRequestDto;
+
 import com.tms.tms_backend.Dto.Request.CreateTravelRequestDto;
 import com.tms.tms_backend.Dto.Response.TravelRequestResponse;
 
@@ -34,4 +36,14 @@ public interface TravelRequestService {
     TravelRequestResponse financeRejectRequest(Long requestId);
 
     List<TravelRequestResponse> getFinanceDecisionHistory();
+
+
+    //Manager New travel request
+
+    TravelRequestResponse createManagerRequest(
+            CreateManagerTravelRequestDto dto
+    );
+
+    List<TravelRequestResponse>
+    getManagerRequestHistory(Long managerId);
 }

@@ -18,6 +18,8 @@ public class TravelRequestResponse {
 
     private String requestCode;
 
+    private String roleTitle;
+
     private String employeeName;
 
     private String department;
@@ -47,4 +49,6 @@ public class TravelRequestResponse {
     private String additionalNotes;
 
     private String status;
+
+
 }
