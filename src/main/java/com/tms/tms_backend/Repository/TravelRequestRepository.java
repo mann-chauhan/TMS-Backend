@@ -11,11 +11,13 @@ public interface TravelRequestRepository
         extends JpaRepository<TravelRequest, Long> {
     List<TravelRequest> findByEmployee_Id(Long employeeId);
 
-    List<TravelRequest>
-    findByManager_Id(Long managerId);
-
     List<TravelRequest> findByManager_IdAndEmployeeIsNull(
             Long managerId
     );
-
+    
+    // Manager dashboard: fetch only requests assigned to the logged-in manager
+    List<TravelRequest>
+    findByManagerId(
+            Long managerId
+    );
 }

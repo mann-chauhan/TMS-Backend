@@ -106,9 +106,14 @@ public class JwtService {
             String token
     ) {
 
-        Integer id =
+        // Claim may deserialize as Integer or Long depending on the JSON parser.
+        Number id =
                 extractAllClaims(token)
-                        .get("userId", Integer.class);
+                        .get("userId", Number.class);
+
+        if (id == null) {
+            return null;
+        }
 
         return id.longValue();
     }

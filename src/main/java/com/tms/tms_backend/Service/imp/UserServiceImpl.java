@@ -30,13 +30,37 @@ public class UserServiceImpl implements UserService {
         Role role = roleRepository.findById(request.getRoleId())
                 .orElseThrow(() -> new RuntimeException("Role not found"));
 
+        // Basic data validation to prevent downstream "department is null" issues.
+        if (role.getName() == Role.RoleName.EMPLOYEE
+                || role.getName() == Role.RoleName.MANAGER) {
+            if (request.getDepartment() == null || request.getDepartment().trim().isEmpty()) {
+                throw new RuntimeException("Department is required");
+            }
+        }
+
+        // Enforce "one manager per department" at write time (prevents duplicates).
+        if (role.getName() == Role.RoleName.MANAGER) {
+            boolean exists =
+                    userRepository.existsByDepartmentAndRole_Name(
+                            request.getDepartment().trim(),
+                            Role.RoleName.MANAGER
+                    );
+            if (exists) {
+                throw new RuntimeException("Department already has manager");
+            }
+        }
+
         User user = User.builder()
                 .employeeCode(request.getEmployeeCode())
                 .fullName(request.getFullName())
                 .email(request.getEmail())
                 .password(request.getPassword())
                 .phone(request.getPhone())
-                .department(request.getDepartment())
+                .department(
+                        request.getDepartment() != null
+                                ? request.getDepartment().trim()
+                                : null
+                )
                 .isActive(request.getIsActive())
                 .profileImage(request.getProfileImage())
                 .role(role)
@@ -60,14 +84,22 @@ public class UserServiceImpl implements UserService {
     @Override
     public ManagerResponse getManagerByDepartment(String department) {
 
-        User manager = userRepository
-                .findByDepartmentAndRole_Name(
+        List<User> managers =
+                userRepository.findAllByDepartmentAndRole_Name(
                         department,
                         Role.RoleName.MANAGER
-                )
-                .orElseThrow(() ->
-                        new RuntimeException("Manager not found")
                 );
+
+        if (managers.isEmpty()) {
+            throw new RuntimeException("Manager not found");
+        }
+        if (managers.size() > 1) {
+            throw new RuntimeException(
+                    "Duplicate managers found for department=" + department
+            );
+        }
+
+        User manager = managers.getFirst();
 
         return ManagerResponse.builder()
                 .id(manager.getId())

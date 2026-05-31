@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.http.HttpMethod;
 
 import org.springframework.security.config.http.SessionCreationPolicy;
 
@@ -42,21 +43,27 @@ public class SecurityConfig {
                                 "/api/auth/**"
                         ).permitAll()
 
-                        .requestMatchers(
-                                "/api/admin/**"
-                        ).hasRole("ADMIN")
+                        // Users management (admin-only in this project)
+                        .requestMatchers("/api/users/**")
+                        .hasRole("ADMIN")
 
-                        .requestMatchers(
-                                "/api/finance/**"
-                        ).hasRole("FINANCE")
+                        // Travel requests route protection (controllers live under /api/requests/**)
+                        .requestMatchers(HttpMethod.POST, "/api/requests")
+                        .hasRole("EMPLOYEE")
+                        .requestMatchers(HttpMethod.GET, "/api/requests/employee/**")
+                        .hasRole("EMPLOYEE")
+                        .requestMatchers("/api/requests/cancel/**")
+                        .hasRole("EMPLOYEE")
 
-                        .requestMatchers(
-                                "/api/manager/**"
-                        ).hasRole("MANAGER")
+                        .requestMatchers("/api/requests/manager/**")
+                        .hasRole("MANAGER")
+                        .requestMatchers("/api/requests/approve/**")
+                        .hasRole("MANAGER")
+                        .requestMatchers("/api/requests/reject/**")
+                        .hasRole("MANAGER")
 
-                        .requestMatchers(
-                                "/api/employee/**"
-                        ).hasRole("EMPLOYEE")
+                        .requestMatchers("/api/requests/finance/**")
+                        .hasRole("FINANCE")
 
                         .anyRequest()
                         .authenticated()

@@ -69,6 +69,9 @@ public class AuthController {
                 .name(
                         user.getFullName()
                 )
+                .userId(
+                        user.getId()
+                )
 
                 .build();
     }

@@ -11,6 +11,8 @@ import com.tms.tms_backend.Repository.TravelRequestRepository;
 import com.tms.tms_backend.Repository.UserRepository;
 import com.tms.tms_backend.Service.TravelRequestService;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -20,6 +22,9 @@ import java.util.List;
 @RequiredArgsConstructor
 public class TravelRequestServiceImpl
         implements TravelRequestService {
+
+    private static final Logger log =
+            LoggerFactory.getLogger(TravelRequestServiceImpl.class);
 
     private final TravelRequestRepository
             travelRequestRepository;
@@ -39,16 +44,40 @@ public class TravelRequestServiceImpl
                 new RuntimeException("Employee not found")
         );
 
+        log.info(
+                "Create travel request: employeeId={}, employeeName={}, employeeDepartment={}",
+                employee.getId(),
+                employee.getFullName(),
+                employee.getDepartment()
+        );
+
+        String department = employee.getDepartment();
+        if (department == null || department.trim().isEmpty()) {
+            // This is the reason your manager lookup becomes:
+            // where u1_0.department is null and r1_0.name = 'MANAGER'
+            throw new RuntimeException(
+                    "Employee department is missing for userId=" + employee.getId()
+            );
+        }
+
         // MANAGER
 
-        User manager = userRepository
-                .findByDepartmentAndRole_Name(
-                        employee.getDepartment(),
+        List<User> managers =
+                userRepository.findAllByDepartmentAndRole_Name(
+                        department.trim(),
                         Role.RoleName.MANAGER
-                )
-                .orElseThrow(() ->
-                        new RuntimeException("Manager not found")
                 );
+
+        if (managers.isEmpty()) {
+            throw new RuntimeException("Manager not found");
+        }
+        if (managers.size() > 1) {
+            throw new RuntimeException(
+                    "Duplicate managers found for department=" + department.trim()
+            );
+        }
+
+        User manager = managers.getFirst();
 
         // CREATE REQUEST
 
@@ -386,7 +415,9 @@ public class TravelRequestServiceImpl
         List<TravelRequest> requests =
 
                 travelRequestRepository
-                        .findByManager_Id(managerId);
+                        // Enforces department-based visibility because manager_id is assigned
+                        // at creation time based on the employee's department.
+                        .findByManagerId(managerId);
 
         return requests.stream()
 

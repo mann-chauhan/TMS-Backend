@@ -59,6 +59,7 @@ public class TravelRequest {
 
     @ManyToOne
     @JoinColumn(name = "manager_id")
+    // Department manager assigned at creation time (used for manager-scoped visibility).
     private User manager;
 
     // STATUS
