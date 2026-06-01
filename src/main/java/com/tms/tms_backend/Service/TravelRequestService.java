@@ -21,11 +21,22 @@ public interface TravelRequestService {
     //Manager Approval Module
     List<TravelRequestResponse>
     getRequestsByManager(Long managerId);
+
     TravelRequestResponse approveRequest(
             Long requestId
     );
     TravelRequestResponse rejectRequest(
             Long requestId
+    );
+
+    // Ownership validation (manager must own the request)
+    TravelRequestResponse approveRequest(
+            Long requestId,
+            Long managerId
+    );
+    TravelRequestResponse rejectRequest(
+            Long requestId,
+            Long managerId
     );
 
     //Finance Approval Module

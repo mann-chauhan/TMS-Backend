@@ -419,6 +419,7 @@ public class TravelRequestServiceImpl
                         // at creation time based on the employee's department.
                         .findByManagerId(managerId);
 
+
         return requests.stream()
 
                 .map(request ->
@@ -432,9 +433,14 @@ public class TravelRequestServiceImpl
                                 )
 
                                 .employeeName(
-                                        request.getEmployee()
-                                                .getFullName()
+                                        request.getEmployee() != null
+                                                ? request.getEmployee().getFullName()
+                                                : request.getManager().getFullName()
                                 )
+//                                .employeeName(
+//                                        request.getEmployee()
+//                                                .getFullName()
+//                                )
 
                                 .managerName(
                                         request.getManager()
@@ -499,6 +505,15 @@ public class TravelRequestServiceImpl
     public TravelRequestResponse approveRequest(
             Long requestId
     ) {
+        // Force callers to use the ownership-validating overload.
+        throw new RuntimeException("managerId required");
+    }
+
+    @Override
+    public TravelRequestResponse approveRequest(
+            Long requestId,
+            Long managerId
+    ) {
 
         TravelRequest request =
 
@@ -506,9 +521,15 @@ public class TravelRequestServiceImpl
                         .findById(requestId)
                         .orElseThrow(() ->
                                 new RuntimeException(
-                                        "Request not found"
+                                "Request not found"
                                 )
                         );
+
+        if (request.getManager() == null
+                || request.getManager().getId() == null
+                || !request.getManager().getId().equals(managerId)) {
+            throw new RuntimeException("Not allowed");
+        }
 
         if(request.getStatus()
                 != TravelRequestStatus.DRAFT){
@@ -532,6 +553,15 @@ public class TravelRequestServiceImpl
     public TravelRequestResponse rejectRequest(
             Long requestId
     ) {
+        // Force callers to use the ownership-validating overload.
+        throw new RuntimeException("managerId required");
+    }
+
+    @Override
+    public TravelRequestResponse rejectRequest(
+            Long requestId,
+            Long managerId
+    ) {
 
         TravelRequest request =
 
@@ -539,9 +569,15 @@ public class TravelRequestServiceImpl
                         .findById(requestId)
                         .orElseThrow(() ->
                                 new RuntimeException(
-                                        "Request not found"
+                                "Request not found"
                                 )
                         );
+
+        if (request.getManager() == null
+                || request.getManager().getId() == null
+                || !request.getManager().getId().equals(managerId)) {
+            throw new RuntimeException("Not allowed");
+        }
 
         if(request.getStatus()
                 != TravelRequestStatus.DRAFT){
@@ -611,9 +647,11 @@ public class TravelRequestServiceImpl
         // FINANCE AUDIT INFO
         // =====================================
 
-        request.setFinanceRemarks(
-                "Approved by finance team"
-        );
+        if (remarks == null || remarks.trim().isEmpty()) {
+            request.setFinanceRemarks("Approved by finance team");
+        } else {
+            request.setFinanceRemarks(remarks);
+        }
 
         request.setFinanceActionBy(
                 "Finance Admin"
@@ -621,10 +659,6 @@ public class TravelRequestServiceImpl
 
         request.setFinanceActionDate(
                 LocalDateTime.now()
-        );
-
-        request.setFinanceRemarks(
-                remarks
         );
 
         TravelRequest updated =
@@ -664,9 +698,11 @@ public class TravelRequestServiceImpl
         // FINANCE AUDIT INFO
         // =====================================
 
-        request.setFinanceRemarks(
-                "Rejected by finance team"
-        );
+        if (remarks == null || remarks.trim().isEmpty()) {
+            request.setFinanceRemarks("Rejected by finance team");
+        } else {
+            request.setFinanceRemarks(remarks);
+        }
 
         request.setFinanceActionBy(
                 "Finance Admin"

@@ -57,6 +57,8 @@ public class SecurityConfig {
 
                         .requestMatchers("/api/requests/manager/**")
                         .hasRole("MANAGER")
+                        .requestMatchers("/api/requests/manager")
+                        .hasRole("MANAGER")
                         .requestMatchers("/api/requests/approve/**")
                         .hasRole("MANAGER")
                         .requestMatchers("/api/requests/reject/**")

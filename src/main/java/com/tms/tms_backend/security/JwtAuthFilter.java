@@ -78,6 +78,9 @@ public class JwtAuthFilter
             role =
                     jwtService.extractRole(token);
 
+            System.out.println("JWT EMAIL = " + email);
+            System.out.println("JWT ROLE = " + role);
+
         } catch (Exception e) {
 
             filterChain.doFilter(
@@ -121,7 +124,9 @@ public class JwtAuthFilter
 
                         List.of(
                                 new SimpleGrantedAuthority(
-                                        "ROLE_" + role
+                                        role != null && role.startsWith("ROLE_")
+                                                ? role
+                                                : "ROLE_" + role
                                 )
                         )
                 );
@@ -129,6 +134,10 @@ public class JwtAuthFilter
 // =====================================
 // SET AUTHENTICATION
 // =====================================
+        System.out.println(
+                "AUTHORITY = " +
+                        authToken.getAuthorities()
+        );
 
         SecurityContextHolder
                 .getContext()

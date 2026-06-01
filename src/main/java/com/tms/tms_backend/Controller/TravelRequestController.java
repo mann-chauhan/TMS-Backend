@@ -259,8 +259,22 @@ public class TravelRequestController {
 
     @PutMapping("/approve/{id}")
     public ApiResponse approveRequest(
+            @RequestHeader("Authorization") String authorizationHeader,
             @PathVariable Long id
     ) {
+
+        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+            throw new RuntimeException("Missing or invalid Authorization header");
+        }
+        String token = authorizationHeader.substring(7);
+        String emailFromJwt = jwtService.extractEmail(token);
+        Long resolvedManagerId =
+                userRepository
+                        .findByEmail(emailFromJwt)
+                        .orElseThrow(() ->
+                                new RuntimeException("Manager not found")
+                        )
+                        .getId();
 
         return ApiResponse.builder()
 
@@ -272,7 +286,7 @@ public class TravelRequestController {
 
                 .data(
                         travelRequestService
-                                .approveRequest(id)
+                                .approveRequest(id, resolvedManagerId)
                 )
 
                 .build();
@@ -284,8 +298,22 @@ public class TravelRequestController {
 
     @PutMapping("/reject/{id}")
     public ApiResponse rejectRequest(
+            @RequestHeader("Authorization") String authorizationHeader,
             @PathVariable Long id
     ) {
+
+        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+            throw new RuntimeException("Missing or invalid Authorization header");
+        }
+        String token = authorizationHeader.substring(7);
+        String emailFromJwt = jwtService.extractEmail(token);
+        Long resolvedManagerId =
+                userRepository
+                        .findByEmail(emailFromJwt)
+                        .orElseThrow(() ->
+                                new RuntimeException("Manager not found")
+                        )
+                        .getId();
 
         return ApiResponse.builder()
 
@@ -297,7 +325,7 @@ public class TravelRequestController {
 
                 .data(
                         travelRequestService
-                                .rejectRequest(id)
+                                .rejectRequest(id, resolvedManagerId)
                 )
 
                 .build();
